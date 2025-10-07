@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "JQSwift",
+    name: "JQ",
     platforms: [
         .macOS(.v10_15),
         .iOS(.v13),
@@ -12,8 +12,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "JQSwift",
-            targets: ["JQSwift"]
+            name: "JQ",
+            targets: ["JQ"]
         ),
     ],
     targets: [
@@ -119,13 +119,13 @@ let package = Package(
             ]
         ),
         .target(
-            name: "JQSwift",
+            name: "JQ",
             dependencies: ["Cjq"],
             swiftSettings: []
         ),
         .testTarget(
-            name: "JQSwiftTests",
-            dependencies: ["JQSwift"]
+            name: "JQTests",
+            dependencies: ["JQ"]
         ),
     ]
 )

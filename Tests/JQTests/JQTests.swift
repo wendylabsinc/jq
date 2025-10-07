@@ -1,7 +1,7 @@
 import XCTest
-@testable import JQSwift
+@testable import JQ
 
-final class JQSwiftTests: XCTestCase {
+final class JQTests: XCTestCase {
 
     func testSimpleFilter() throws {
         let input = """

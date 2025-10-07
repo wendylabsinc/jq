@@ -1,5 +1,5 @@
 import Foundation
-import JQSwift
+import JQ
 
 // Example usage of JQSwift
 

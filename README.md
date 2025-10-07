@@ -1,4 +1,4 @@
-# JQSwift
+# JQ
 
 A Swift wrapper for [jq](https://jqlang.github.io/jq/) - a lightweight and flexible command-line JSON processor.
 
@@ -6,7 +6,7 @@ A Swift wrapper for [jq](https://jqlang.github.io/jq/) - a lightweight and flexi
 
 - ✅ Full jq 1.7.1 functionality embedded as a Swift package
 - ✅ Cross-platform support (macOS, iOS, tvOS, watchOS, visionOS, Linux)
-- ✅ Swift 6.2 with strict concurrency support
+- ✅ Swift 6 compatible API
 - ✅ Type-safe Swift API with Codable support
 - ✅ Zero external dependencies (jq and oniguruma embedded via git submodules)
 
@@ -19,11 +19,11 @@ A Swift wrapper for [jq](https://jqlang.github.io/jq/) - a lightweight and flexi
 
 ### Swift Package Manager
 
-Add JQSwift to your `Package.swift`:
+Add JQ to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/YOUR_USERNAME/jq-swift.git", from: "1.0.0")
+    .package(url: "https://github.com/wendylabsinc/jqswift", from: "0.1.0")
 ]
 ```
 
@@ -34,8 +34,8 @@ Or add it via Xcode: File → Add Package Dependencies
 Since this package uses git submodules for jq and oniguruma:
 
 ```bash
-git clone --recursive https://github.com/YOUR_USERNAME/jq-swift.git
-cd jq-swift
+git clone --recursive https://github.com/wendylabsinc/jqswift
+cd jqswift
 ```
 
 If you already cloned without `--recursive`:
@@ -49,7 +49,7 @@ git submodule update --init --recursive
 ### Basic Examples
 
 ```swift
-import JQSwift
+import JQ
 
 // Simple property access
 let json = """
@@ -86,7 +86,7 @@ let nycUsers = try JQ.process(
 
 ```swift
 import Foundation
-import JQSwift
+import JQ
 
 let jsonData = """
 {"name": "John", "age": 30}
@@ -194,14 +194,14 @@ The package uses git submodules to track upstream jq releases, making updates st
 ## Architecture
 
 ```
-JQSwift/
+JQ/
 ├── Sources/
 │   ├── Cjq/              # C library wrapper
 │   │   ├── include/      # Public C headers and module map
 │   │   └── jq/           # Git submodule: jq source + oniguruma
-│   └── JQSwift/          # Swift wrapper API
+│   └── JQ/               # Swift wrapper API
 ├── Tests/
-│   └── JQSwiftTests/
+│   └── JQTests/
 └── Package.swift
 ```
 
