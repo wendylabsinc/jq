@@ -16,6 +16,7 @@ let package = Package(
             targets: ["JQ"]
         ),
     ],
+    dependencies: [],
     targets: [
         .target(
             name: "Cjq",
