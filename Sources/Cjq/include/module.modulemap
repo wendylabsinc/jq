@@ -1,0 +1,5 @@
+module Cjq {
+    header "jq.h"
+    header "jv.h"
+    export *
+}
