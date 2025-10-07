@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
@@ -121,9 +121,7 @@ let package = Package(
         .target(
             name: "JQSwift",
             dependencies: ["Cjq"],
-            swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency")
-            ]
+            swiftSettings: []
         ),
         .testTarget(
             name: "JQSwiftTests",
