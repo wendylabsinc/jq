@@ -109,10 +109,11 @@ let package = Package(
                 .define("HAVE_GMTIME_R"),
                 .define("HAVE_LOCALTIME_R"),
                 .define("IEEE_8087"),  // Little-endian IEEE floating point (x86, ARM)
-                .headerSearchPath("include"),
+                // Prefer jq paths before our wrapper include dir
                 .headerSearchPath("jq"),
                 .headerSearchPath("jq/src"),
                 .headerSearchPath("jq/modules/oniguruma/src"),
+                .headerSearchPath("include"),
                 .unsafeFlags(["-Wno-everything"], .when(configuration: .release)),
             ],
             linkerSettings: [
