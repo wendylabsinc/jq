@@ -3,17 +3,12 @@
 #define JQ_SWIFT_SYS_TIME_H
 
 #ifdef _WIN32
+#include <winsock.h>
 #include <time.h>
 #include <sys/timeb.h>
 
 // Define timeval if not defined and prevent later winsock redefinition
-#ifndef _TIMEVAL_DEFINED
-#define _TIMEVAL_DEFINED 1
-struct timeval {
-  long tv_sec;
-  long tv_usec;
-};
-#endif
+/* winsock.h defines struct timeval and guards with _TIMEVAL_DEFINED */
 
 static inline int gettimeofday(struct timeval *tv, void *tz_unused) {
   (void)tz_unused;
