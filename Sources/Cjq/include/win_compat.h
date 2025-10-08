@@ -34,6 +34,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <time.h>
 #ifndef isatty
 #define isatty _isatty
 #endif
@@ -72,6 +73,14 @@ static BOOL CALLBACK jq_once_callback(PINIT_ONCE init_once, PVOID parameter, PVO
 static inline int pthread_once(pthread_once_t* once_control, void (*init_routine)(void)) {
   return InitOnceExecuteOnce(once_control, jq_once_callback, (PVOID)init_routine, NULL) ? 0 : 1;
 }
+
+// tz globals mapping
+#ifndef tzname
+#define tzname _tzname
+#endif
+#ifndef timezone
+#define timezone _timezone
+#endif
 
 #endif // _WIN32
 
