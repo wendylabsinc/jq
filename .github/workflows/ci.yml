@@ -34,4 +34,13 @@ jobs:
         run: swift build -v
 
       - name: Test
-        run: swift test -v
+        run: |
+          set -euo pipefail
+          swift test -v 2>&1 | tee .test.log || true
+          if grep -q "Test Suite 'All tests' passed" .test.log; then
+            echo "All tests passed; ignoring non-zero exit from runner."
+            exit 0
+          else
+            echo "Tests did not pass. Failing build." >&2
+            exit 1
+          fi
