@@ -30,6 +30,7 @@
 
 // Basic POSIX I/O helpers used by jq
 #include <io.h>
+#include <windows.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -56,6 +57,21 @@ typedef SSIZE_T ssize_t;
 #ifndef S_ISDIR
 #define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
 #endif
+
+// pthread_once emulation using Windows InitOnce
+typedef INIT_ONCE pthread_once_t;
+#ifndef PTHREAD_ONCE_INIT
+#define PTHREAD_ONCE_INIT INIT_ONCE_STATIC_INIT
+#endif
+static BOOL CALLBACK jq_once_callback(PINIT_ONCE init_once, PVOID parameter, PVOID* context) {
+  (void)init_once; (void)context;
+  void (*fn)(void) = (void (*)(void))parameter;
+  fn();
+  return TRUE;
+}
+static inline int pthread_once(pthread_once_t* once_control, void (*init_routine)(void)) {
+  return InitOnceExecuteOnce(once_control, jq_once_callback, (PVOID)init_routine, NULL) ? 0 : 1;
+}
 
 #endif // _WIN32
 
