@@ -32,6 +32,7 @@
 #include <io.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #ifndef isatty
 #define isatty _isatty
 #endif
@@ -49,6 +50,11 @@ typedef SSIZE_T ssize_t;
 // PATH_MAX fallback for Windows (prefer large path capacity)
 #ifndef PATH_MAX
 #define PATH_MAX 32767
+#endif
+
+// stat macros parity
+#ifndef S_ISDIR
+#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
 #endif
 
 #endif // _WIN32
