@@ -32,6 +32,18 @@ jobs:
             --hosting-base-path jq \
             --output-path docs
 
+      - name: Redirect root to module landing
+        run: |
+          cat > docs/index.html <<'HTML'
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>Redirecting…</title>
+          <meta http-equiv="refresh" content="0; url=/jq/documentation/jq/">
+          <link rel="canonical" href="/jq/documentation/jq/">
+          <script>location.replace('/jq/documentation/jq/' + location.search + location.hash)</script>
+          <p>If you are not redirected automatically, follow this <a href="/jq/documentation/jq/">link to documentation</a>.</p>
+          HTML
+
       - name: Add 404 fallback for SPA routing
         run: cp docs/index.html docs/404.html
 
