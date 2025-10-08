@@ -16,7 +16,10 @@ let package = Package(
             targets: ["JQ"]
         ),
     ],
-    dependencies: [],
+    dependencies: [
+        // DocC plugin for generating documentation from DocC comments
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
+    ],
     targets: [
         .target(
             name: "Cjq",

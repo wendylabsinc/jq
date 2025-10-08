@@ -5,7 +5,18 @@ import Foundation
 #endif
 import Cjq
 
-/// JQ errors
+/// Errors thrown by the JQ wrapper.
+///
+/// These map to common failure points when compiling filters, parsing input, or executing jq.
+///
+/// Example:
+/// ```swift
+/// do {
+///     _ = try JQ.process(filter: "[", input: "{}")
+/// } catch let error as JQError {
+///     print(error.description)
+/// }
+/// ```
 public enum JQError: Error, CustomStringConvertible {
     case compileError(String)
     case executionError(String)
@@ -22,7 +33,23 @@ public enum JQError: Error, CustomStringConvertible {
     }
 }
 
-/// Main JQ wrapper class
+/// A lightweight Swift wrapper around the embedded jq C library.
+///
+/// Use the static `process` helpers to evaluate jq filters against JSON input.
+///
+/// Example – basic extraction:
+/// ```swift
+/// let input = "{" + "\"name\":\"Alice\",\"age\":30" + "}"
+/// let out = try JQ.process(filter: ".name", input: input)
+/// // out == ["\"Alice\""]
+/// ```
+///
+/// Example – filtering arrays:
+/// ```swift
+/// let input = "[1,2,3,4,5]"
+/// let out = try JQ.process(filter: ".[] | select(. > 3)", input: input)
+/// // out == ["4", "5"]
+/// ```
 public final class JQ: Sendable {
 
     // MARK: - Internal message capture helpers
@@ -54,12 +81,20 @@ public final class JQ: Sendable {
         jv_free(dumped)
     }
 
-    /// Apply a jq filter to JSON input
+    /// Apply a jq filter to a JSON string.
+    ///
     /// - Parameters:
-    ///   - filter: The jq filter expression (e.g., ".foo", ".[] | select(.age > 21)")
-    ///   - input: JSON string to process
-    /// - Returns: Array of JSON strings (one for each output from the filter)
-    /// - Throws: JQError if compilation or execution fails
+    ///   - filter: jq filter expression (e.g., ".foo", ".[] | select(.age > 21)").
+    ///   - input: JSON text to process.
+    /// - Returns: An array of JSON strings (each element is a single jq output value, encoded as JSON).
+    /// - Throws: `JQError` if the filter fails to compile, the input is invalid, or execution fails.
+    ///
+    /// Example:
+    /// ```swift
+    /// let json = "{" + "\"nums\":[1,2,3,4]}"
+    /// let results = try JQ.process(filter: ".nums[] | select(. % 2 == 0)", input: json)
+    /// // results == ["2", "4"]
+    /// ```
     public static func process(filter: String, input: String) throws -> [String] {
         // Initialize jq state
         var state = jq_init()
@@ -185,7 +220,17 @@ public final class JQ: Sendable {
 
 /// Convenience extensions
 extension JQ {
-    /// Process JSON data and return as Data
+    /// Apply a jq filter to JSON `Data` and return outputs as `Data`.
+    ///
+    /// This is convenience over `process(filter:input:)` when your payloads are binary.
+    /// Each returned element is a UTF-8 JSON fragment produced by jq.
+    ///
+    /// Example:
+    /// ```swift
+    /// let data = Data("{\"n\":42}".utf8)
+    /// let outputs = try JQ.process(filter: ".n", jsonData: data)
+    /// // outputs.first -> Data for "42"
+    /// ```
     public static func process(filter: String, jsonData: Data) throws -> [Data] {
         guard let inputStr = String(data: jsonData, encoding: .utf8) else {
             throw JQError.invalidJSON("Input data is not valid UTF-8")
@@ -200,7 +245,25 @@ extension JQ {
         }
     }
 
-    /// Process a JSON object directly (convenience for Codable types)
+    /// Apply a jq filter to a Codable input and decode results to a Codable output type.
+    ///
+    /// - Parameters:
+    ///   - filter: jq filter expression.
+    ///   - input: Any `Encodable` value that will be encoded to JSON for jq.
+    ///   - outputType: The `Decodable` result type for each jq output value.
+    /// - Returns: Array of decoded results of type `U`.
+    ///
+    /// Example:
+    /// ```swift
+    /// struct Person: Codable { let name: String; let age: Int }
+    /// let people = [Person(name: "A", age: 20), Person(name: "B", age: 30)]
+    /// let names: [String] = try JQ.process(
+    ///     filter: "[.[] | select(.age >= 21) | .name] | .[]",
+    ///     input: people,
+    ///     outputType: String.self
+    /// )
+    /// // names == ["B"]
+    /// ```
     public static func process<T: Encodable, U: Decodable>(
         filter: String,
         input: T,
