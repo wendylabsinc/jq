@@ -86,6 +86,11 @@ static inline int pthread_once(pthread_once_t* once_control, void (*init_routine
 extern char *_tzname[2];
 extern long _timezone;
 
+// Map non-ANSI functions
+#ifndef time
+#define time _time64
+#endif
+
 // Undo UNIX feature-test macros that break MSVC headers
 #ifdef _XOPEN_SOURCE
 #undef _XOPEN_SOURCE
