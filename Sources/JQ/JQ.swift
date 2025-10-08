@@ -25,6 +25,35 @@ public enum JQError: Error, CustomStringConvertible {
 /// Main JQ wrapper class
 public final class JQ: Sendable {
 
+    // MARK: - Internal message capture helpers
+    private final class MsgBuffer {
+        var messages: [String] = []
+    }
+    private typealias MsgCB = @convention(c) (UnsafeMutableRawPointer?, jv) -> Void
+    // Capture jq error messages without printing to stderr
+    private static let errorCB: MsgCB = { ctx, msg in
+        let formatted = jq_format_error(msg) // consumes msg
+        if jv_get_kind(formatted) == JV_KIND_STRING, let c = jv_string_value(formatted) {
+            if let ctx {
+                let box = Unmanaged<MsgBuffer>.fromOpaque(ctx).takeUnretainedValue()
+                box.messages.append(String(cString: c))
+            }
+        }
+        jv_free(formatted)
+    }
+    // Silence jq's stderr callback (e.g., from the stderr/1 builtin); store if desired
+    private static let stderrCB: MsgCB = { ctx, value in
+        // Dump value to string (consumes value)
+        let dumped = jv_dump_string(value, 0)
+        if jv_get_kind(dumped) == JV_KIND_STRING, let c = jv_string_value(dumped) {
+            if let ctx {
+                let box = Unmanaged<MsgBuffer>.fromOpaque(ctx).takeUnretainedValue()
+                box.messages.append(String(cString: c))
+            }
+        }
+        jv_free(dumped)
+    }
+
     /// Apply a jq filter to JSON input
     /// - Parameters:
     ///   - filter: The jq filter expression (e.g., ".foo", ".[] | select(.age > 21)")
@@ -39,10 +68,18 @@ public final class JQ: Sendable {
         }
         defer { jq_teardown(&state) }
 
+        // Install callbacks to capture errors/stderr into a Swift buffer
+        let msgBox = MsgBuffer()
+        let boxPtr = Unmanaged.passRetained(msgBox).toOpaque()
+        defer { Unmanaged<MsgBuffer>.fromOpaque(boxPtr).release() }
+        jq_set_error_cb(unwrappedState, errorCB, boxPtr)
+        jq_set_stderr_cb(unwrappedState, stderrCB, boxPtr)
+
         // Compile the filter
         let compileResult = jq_compile(unwrappedState, filter)
         guard compileResult != 0 else {
-            throw JQError.compileError("Failed to compile filter: \(filter)")
+            let message = msgBox.messages.last ?? "Failed to compile filter: \(filter)"
+            throw JQError.compileError(message)
         }
 
         // Parse input JSON
