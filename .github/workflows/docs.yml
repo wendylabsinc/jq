@@ -32,10 +32,13 @@ jobs:
             --hosting-base-path jq \
             --output-path docs
 
+      - name: Add 404 fallback for SPA routing
+        run: cp docs/index.html docs/404.html
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+          enable_jekyll: false
           force_orphan: true
-
