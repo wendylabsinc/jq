@@ -34,13 +34,35 @@ jobs:
         run: swift build -v
 
       - name: Test
+        run: swift test -v
+
+  asan-linux:
+    name: ubuntu-latest • Swift ${{ matrix.swift }} • ASan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ['6.0']
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Swift ${{ matrix.swift }}
+        uses: SwiftyLab/setup-swift@v1
+        with:
+          swift-version: ${{ matrix.swift }}
+
+      - name: Show Swift version
+        run: swift --version
+
+      - name: ASan Test (Linux)
+        env:
+          ASAN_OPTIONS: detect_leaks=1:abort_on_error=1:symbolize=1:fast_unwind_on_malloc=0
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
         run: |
           set -euo pipefail
-          swift test -v 2>&1 | tee .test.log || true
-          if grep -q "Test Suite 'All tests' passed" .test.log; then
-            echo "All tests passed; ignoring non-zero exit from runner."
-            exit 0
-          else
-            echo "Tests did not pass. Failing build." >&2
-            exit 1
-          fi
+          swift test -v --sanitize=address \
+            -Xcc -fno-omit-frame-pointer -Xcc -fsanitize=address \
+            -Xlinker -fsanitize=address
