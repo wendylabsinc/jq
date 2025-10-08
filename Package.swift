@@ -116,6 +116,8 @@ let package = Package(
                 .headerSearchPath("jq/src"),
                 .headerSearchPath("jq/modules/oniguruma/src"),
                 .headerSearchPath("include"),
+                // Silence noisy K&R-style prototypes in vendored Oniguruma during Debug builds
+                .unsafeFlags(["-Wno-deprecated-non-prototype"], .when(configuration: .debug)),
                 .unsafeFlags(["-Wno-everything"], .when(configuration: .release)),
             ],
             linkerSettings: [
