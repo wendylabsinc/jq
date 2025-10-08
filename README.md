@@ -36,18 +36,18 @@ dependencies: [
 
 Or add it via Xcode: File → Add Package Dependencies
 
-### Clone with Submodules
+### Working Locally (Contributors)
 
-Since this package uses git submodules for jq and oniguruma:
+Swift Package Manager automatically fetches this package's git submodules when you add it as a dependency — end users do not need to do anything special.
+
+If you're developing in this repository locally, clone with submodules or initialize them after cloning:
 
 ```bash
+# Recommended: clone with submodules
 git clone --recursive https://github.com/wendylabsinc/jq
 cd jq
-```
 
-If you already cloned without `--recursive`:
-
-```bash
+# If you already cloned without --recursive
 git submodule update --init --recursive
 ```
 
