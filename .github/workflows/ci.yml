@@ -22,6 +22,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install GnuPG (Linux only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg2 dirmngr
+
       - name: Set up Swift ${{ matrix.swift }}
         uses: swift-actions/setup-swift@v2
         with:
