@@ -1,11 +1,16 @@
 # JQ
 
+[![Swift](https://img.shields.io/badge/Swift-6.2+-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS%20|%20macOS%20|%20tvOS%20|%20watchOS%20|%20visionOS%20|%20Linux%20|%20Windows-blue.svg)](https://swift.org)
+[![CI](https://github.com/wendylabsinc/jq/actions/workflows/ci.yml/badge.svg)](https://github.com/wendylabsinc/jq/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 A Swift wrapper for [jq](https://jqlang.github.io/jq/) - a lightweight and flexible command-line JSON processor.
 
 ## Features
 
 - ✅ Full jq 1.7.1 functionality embedded as a Swift package
-- ✅ Cross-platform support (macOS, iOS, tvOS, watchOS, visionOS, Linux)
+- ✅ Cross-platform support (macOS, iOS, tvOS, watchOS, visionOS, Linux, Windows)
 - ✅ Swift 6 compatible API
 - ✅ Type-safe Swift API with Codable support
 - ✅ Zero external dependencies (jq and oniguruma embedded via git submodules)
@@ -13,7 +18,7 @@ A Swift wrapper for [jq](https://jqlang.github.io/jq/) - a lightweight and flexi
 ## Requirements
 
 - Swift 6.2 or later
-- macOS 10.15+ / iOS 13+ / tvOS 13+ / watchOS 6+ / visionOS 1+ / Linux
+- macOS 10.15+ / iOS 13+ / tvOS 13+ / watchOS 6+ / visionOS 1+ / Linux / Windows
 
 ## Installation
 
