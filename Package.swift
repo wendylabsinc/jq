@@ -100,14 +100,15 @@ let package = Package(
             ],
             publicHeadersPath: "include",
             cSettings: [
+                // Platform feature macros
                 .define("_GNU_SOURCE", .when(platforms: [.linux])),
-                .define("HAVE_MEMMEM"),
-                .define("HAVE_ISATTY"),
-                .define("HAVE_STRPTIME"),
+                .define("HAVE_MEMMEM", .when(platforms: [.linux, .macOS])),
+                .define("HAVE_ISATTY", .when(platforms: [.linux, .macOS])),
+                .define("HAVE_STRPTIME", .when(platforms: [.linux, .macOS])),
                 .define("HAVE_STRFTIME"),
-                .define("HAVE_TIMEGM"),
-                .define("HAVE_GMTIME_R"),
-                .define("HAVE_LOCALTIME_R"),
+                .define("HAVE_TIMEGM", .when(platforms: [.linux, .macOS])),
+                .define("HAVE_GMTIME_R", .when(platforms: [.linux, .macOS])),
+                .define("HAVE_LOCALTIME_R", .when(platforms: [.linux, .macOS])),
                 .define("IEEE_8087"),  // Little-endian IEEE floating point (x86, ARM)
                 // Enable Oniguruma-backed regex support in jq
                 .define("HAVE_LIBONIG", to: "1"),
@@ -116,6 +117,9 @@ let package = Package(
                 .headerSearchPath("jq/src"),
                 .headerSearchPath("jq/modules/oniguruma/src"),
                 .headerSearchPath("include"),
+                // Inject Windows compatibility shims and MSVC niceties
+                .unsafeFlags(["-include", "Sources/Cjq/include/win_compat.h"], .when(platforms: [.windows])),
+                .define("_CRT_SECURE_NO_WARNINGS", .when(platforms: [.windows])),
                 // Silence noisy K&R-style prototypes in vendored Oniguruma during Debug builds
                 .unsafeFlags(["-Wno-deprecated-non-prototype"], .when(configuration: .debug)),
                 .unsafeFlags(["-Wno-everything"], .when(configuration: .release)),
