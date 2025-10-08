@@ -48,33 +48,40 @@ public final class JQ: Sendable {
         // Parse input JSON
         let parseInput = jv_parse(input)
         guard jv_is_valid(parseInput) != 0 else {
+            // jv_is_valid does NOT consume, so parseInput is still valid here
             let errorMsg = jvGetErrorMessage(parseInput) ?? "Unknown parsing error"
-            jv_free(parseInput)
+            // jvGetErrorMessage consumes parseInput, so no jv_free needed
             throw JQError.invalidJSON(errorMsg)
         }
 
         // Execute the filter
+        // jq_start consumes parseInput, so no jv_free needed
         jq_start(unwrappedState, parseInput, 0)
 
         // Collect results
         var results: [String] = []
         while true {
             let result = jq_next(unwrappedState)
+            // jv_is_valid does NOT consume
             guard jv_is_valid(result) != 0 else {
                 // Check if it's actually an error or just end of results
+                // jv_invalid_has_msg DOES consume, so we need to copy if we want to use result again
                 if jv_invalid_has_msg(jv_copy(result)) != 0 {
+                    // jvGetErrorMessage consumes its argument
                     let errorMsg = jvGetErrorMessage(result) ?? "Unknown execution error"
-                    jv_free(result)
+                    // result has been consumed by jvGetErrorMessage, no free needed
                     throw JQError.executionError(errorMsg)
                 }
+                // jv_invalid_has_msg consumed the copy, but result is still valid
                 jv_free(result)
                 break
             }
 
-            // Convert result to string
+            // Convert result to string (jvToString will handle memory correctly)
             if let resultStr = jvToString(result) {
                 results.append(resultStr)
             }
+            // jvToString passes a copy to jv_dump_string, so result is still owned by us
             jv_free(result)
         }
 
@@ -83,32 +90,59 @@ public final class JQ: Sendable {
 
     /// Helper function to convert jv to String
     private static func jvToString(_ value: jv) -> String? {
-        let dumped = jv_dump_string(value, 0)
-        defer { jv_free(dumped) }
+        // jv_dump_string consumes its argument (it frees it). Pass a copy
+        // so the caller still owns `value` and can free it after use.
+        let dumped = jv_dump_string(jv_copy(value), 0)
 
-        guard jv_get_kind(dumped) == JV_KIND_STRING else {
+        guard jv_is_valid(dumped) != 0 else {
+            jv_free(dumped)
             return nil
         }
 
-        let cStr = jv_string_value(dumped)
-        return cStr.map { String(cString: $0) }
+        guard jv_get_kind(dumped) == JV_KIND_STRING else {
+            jv_free(dumped)
+            return nil
+        }
+
+        guard let cStr = jv_string_value(dumped) else {
+            jv_free(dumped)
+            return nil
+        }
+
+        let result = String(cString: cStr)
+        jv_free(dumped)
+        return result
     }
 
     /// Helper function to extract error message from invalid jv
+    /// This function CONSUMES the input jv
     private static func jvGetErrorMessage(_ value: jv) -> String? {
+        // jv_invalid_has_msg CONSUMES its argument
         guard jv_invalid_has_msg(jv_copy(value)) != 0 else {
+            // has_msg consumed the copy, value is still valid, so free it
+            jv_free(value)
             return nil
         }
 
+        // jv_invalid_get_msg CONSUMES its argument
         let msg = jv_invalid_get_msg(value)
-        defer { jv_free(msg) }
+        // value has been consumed, don't free it
 
+        // jv_get_kind does NOT consume
         guard jv_get_kind(msg) == JV_KIND_STRING else {
+            jv_free(msg)
             return nil
         }
 
-        let cStr = jv_string_value(msg)
-        return cStr.map { String(cString: $0) }
+        // jv_string_value does NOT consume
+        guard let cStr = jv_string_value(msg) else {
+            jv_free(msg)
+            return nil
+        }
+
+        let result = String(cString: cStr)
+        jv_free(msg)
+        return result
     }
 }
 

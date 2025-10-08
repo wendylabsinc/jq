@@ -1,0 +1,52 @@
+[0/1] Planning build
+Building for debugging...
+[0/3] Write swift-version--58304C5D6DBC2206.txt
+[2/5] Compiling JQTests JQCoreAndAPI.tests.swift
+[3/5] Emitting module JQTests
+[4/7] Compiling JQPackageTests runner.swift
+[5/7] Emitting module JQPackageTests
+[5/7] Write Objects.LinkFileList
+[6/7] Linking JQPackageTests
+Build complete! (1.39s)
+Test Suite 'All tests' started at 2025-10-08 02:55:28.030.
+Test Suite 'All tests' passed at 2025-10-08 02:55:28.031.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+􀟈  Test run started.
+􀄵  Testing Library Version: 124.4
+􀄵  Target Platform: arm64e-apple-macos14.0
+􀟈  Suite "Errors and edge cases" started.
+􀟈  Suite "Core JQ API" started.
+􀟈  Suite "Typed API (Codable)" started.
+􀟈  Test "Unicode and large numbers" started.
+􀟈  Test "Object construction" started.
+􀟈  Test "Invalid filter triggers compileError" started.
+􀟈  Test "Regex: match/test with Oniguruma" started.
+􀟈  Test "Execution error via error()" started.
+􀟈  Test "Identity filter" started.
+􀟈  Test "Array iteration emits multiple outputs" started.
+􀟈  Test "Simple property access" started.
+􀟈  Test "Length and keys functions" started.
+􀟈  Test "Map to array of objects" started.
+􀟈  Test "JSON Data in/out" started.
+􀟈  Test "Invalid JSON triggers invalidJSON error" started.
+􀟈  Test "Decode to scalar types" started.
+jq: error: syntax error, unexpected end of file (Unix shell quoting issues?) at <top-level>, line 1:
+.invalid[[[          
+jq: 1 compile error
+􁁛  Test "Invalid filter triggers compileError" passed after 0.001 seconds.
+􁁛  Test "JSON Data in/out" passed after 0.001 seconds.
+􁁛  Test "Invalid JSON triggers invalidJSON error" passed after 0.002 seconds.
+􁁛  Test "Array iteration emits multiple outputs" passed after 0.002 seconds.
+􁁛  Test "Object construction" passed after 0.002 seconds.
+􁁛  Test "Execution error via error()" passed after 0.002 seconds.
+􁁛  Test "Identity filter" passed after 0.002 seconds.
+􁁛  Test "Simple property access" passed after 0.002 seconds.
+􁁛  Test "Map to array of objects" passed after 0.002 seconds.
+􁁛  Test "Unicode and large numbers" passed after 0.003 seconds.
+􁁛  Test "Decode to scalar types" passed after 0.003 seconds.
+􁁛  Test "Length and keys functions" passed after 0.003 seconds.
+􁁛  Suite "Typed API (Codable)" passed after 0.003 seconds.
+􁁛  Suite "Core JQ API" passed after 0.003 seconds.
+􁁛  Test "Regex: match/test with Oniguruma" passed after 0.003 seconds.
+􁁛  Suite "Errors and edge cases" passed after 0.003 seconds.
+􁁛  Test run with 13 tests passed after 0.003 seconds.

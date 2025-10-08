@@ -109,6 +109,8 @@ let package = Package(
                 .define("HAVE_GMTIME_R"),
                 .define("HAVE_LOCALTIME_R"),
                 .define("IEEE_8087"),  // Little-endian IEEE floating point (x86, ARM)
+                // Enable Oniguruma-backed regex support in jq
+                .define("HAVE_LIBONIG", to: "1"),
                 // Prefer jq paths before our wrapper include dir
                 .headerSearchPath("jq"),
                 .headerSearchPath("jq/src"),

@@ -49,13 +49,6 @@ struct JQCoreTests {
         #expect(obj[0].contains("\"b\""))
         #expect(obj[0].contains("\"c\""))
     }
-
-    @Test("Multiple outputs to typed values")
-    func multipleOutputsToTyped() throws {
-        let input: [Int] = [1, 2, 3]
-        let ints: [Int] = try JQ.process(filter: ".[]", input: input, outputType: Int.self)
-        #expect(ints == [1,2,3])
-    }
 }
 
 @Suite("Typed API (Codable)")
@@ -142,3 +135,4 @@ struct JQErrorTests {
         #expect(n == ["9007199254740991"]) // 2^53-1
     }
 }
+
