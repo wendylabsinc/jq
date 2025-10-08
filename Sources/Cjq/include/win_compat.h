@@ -6,6 +6,11 @@
 
 #ifdef _WIN32
 
+// Normalize Windows macro expected by jq sources
+#ifndef WIN32
+#define WIN32 1
+#endif
+
 // The flex-generated lexer tries to include <unistd.h>.
 // That header does not exist on Windows/MSVC; tell it to skip.
 #ifndef YY_NO_UNISTD_H
@@ -25,6 +30,8 @@
 
 // Basic POSIX I/O helpers used by jq
 #include <io.h>
+#include <limits.h>
+#include <stdlib.h>
 #ifndef isatty
 #define isatty _isatty
 #endif
@@ -37,6 +44,11 @@
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
 #define _SSIZE_T_DEFINED
+#endif
+
+// PATH_MAX fallback for Windows (prefer large path capacity)
+#ifndef PATH_MAX
+#define PATH_MAX 32767
 #endif
 
 #endif // _WIN32
