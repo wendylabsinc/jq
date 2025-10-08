@@ -82,6 +82,10 @@ static inline int pthread_once(pthread_once_t* once_control, void (*init_routine
 #define timezone _timezone
 #endif
 
+// Declare MSVCRT timezone globals if headers don't
+extern char *_tzname[2];
+extern long _timezone;
+
 #endif // _WIN32
 
 #endif // JQ_SWIFT_WIN_COMPAT_H
