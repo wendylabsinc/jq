@@ -23,7 +23,7 @@ Add JQ to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wendylabsinc/jqswift", from: "0.1.0")
+    .package(url: "https://github.com/wendylabsinc/jq", from: "0.3.0")
 ]
 ```
 
@@ -34,8 +34,8 @@ Or add it via Xcode: File → Add Package Dependencies
 Since this package uses git submodules for jq and oniguruma:
 
 ```bash
-git clone --recursive https://github.com/wendylabsinc/jqswift
-cd jqswift
+git clone --recursive https://github.com/wendylabsinc/jq
+cd jq
 ```
 
 If you already cloned without `--recursive`:
