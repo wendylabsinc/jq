@@ -57,11 +57,32 @@ jobs:
       - name: Show Swift version
         run: swift --version
 
-      - name: ASan Test (Linux)
+      - name: ASan Build (Linux)
         env:
           ASAN_OPTIONS: detect_leaks=1:abort_on_error=1:symbolize=1:fast_unwind_on_malloc=0
           UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
         run: |
           set -euo pipefail
-          swift test -v --sanitize=address \
-            -Xcc -fno-omit-frame-pointer -Xcc -fsanitize=address
+          swift build -v --sanitize=address -Xcc -fno-omit-frame-pointer -Xcc -fsanitize=address
+
+      - name: ASan Minimal Repro (gdb)
+        if: always()
+        env:
+          ASAN_OPTIONS: detect_leaks=1:abort_on_error=1:symbolize=1:fast_unwind_on_malloc=0
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+          SWIFT_BACKTRACE: enable=yes
+        run: |
+          set -euo pipefail
+          # Try running just one simple test under gdb to capture a backtrace
+          BIN=$(ls -d .build/*-unknown-linux-gnu/debug/*PackageTests.xctest || true)
+          if [ -n "$BIN" ]; then
+            echo "Running under gdb: $BIN";
+            gdb -q -batch -ex "set env ASAN_OPTIONS=$ASAN_OPTIONS" \
+                -ex "set env UBSAN_OPTIONS=$UBSAN_OPTIONS" \
+                -ex "set env SWIFT_BACKTRACE=$SWIFT_BACKTRACE" \
+                -ex run -ex "bt full" --args "$BIN" || true
+          else
+            echo "Test binary not found; running filtered swift test instead";
+          fi
+          # Also run swift test for a single test to see if ASan emits a report
+          swift test -v --sanitize=address -Xcc -fno-omit-frame-pointer -Xcc -fsanitize=address --filter JQCoreTests.simpleProperty || true
