@@ -86,6 +86,14 @@ static inline int pthread_once(pthread_once_t* once_control, void (*init_routine
 extern char *_tzname[2];
 extern long _timezone;
 
+// Undo UNIX feature-test macros that break MSVC headers
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+#ifdef _XOPEN_SOURCE_EXTENDED
+#undef _XOPEN_SOURCE_EXTENDED
+#endif
+
 #endif // _WIN32
 
 #endif // JQ_SWIFT_WIN_COMPAT_H
