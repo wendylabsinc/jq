@@ -3,16 +3,9 @@
 #define JQ_SWIFT_SYS_TIME_H
 
 #ifdef _WIN32
+#include <winsock2.h> // must come before windows.h
 #include <windows.h>
 #include <time.h>
-#include <winsock.h>
-
-#if !defined(_WINSOCKAPI_) && !defined(_WINSOCK2API_)
-struct timeval {
-  long tv_sec;   // seconds
-  long tv_usec;  // microseconds
-};
-#endif
 
 static inline int gettimeofday(struct timeval *tv, void *tz_unused) {
   (void)tz_unused;
