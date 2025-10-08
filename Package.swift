@@ -104,7 +104,7 @@ let package = Package(
                 .define("_GNU_SOURCE", .when(platforms: [.linux])),
                 .define("HAVE_MEMMEM", .when(platforms: [.linux, .macOS])),
                 .define("HAVE_ISATTY", .when(platforms: [.linux, .macOS])),
-                .define("HAVE_STRPTIME", .when(platforms: [.linux, .macOS])),
+                .define("HAVE_STRPTIME"),
                 .define("HAVE_STRFTIME"),
                 .define("HAVE_TIMEGM", .when(platforms: [.linux, .macOS])),
                 .define("HAVE_GMTIME_R", .when(platforms: [.linux, .macOS])),
