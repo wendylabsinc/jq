@@ -64,5 +64,4 @@ jobs:
         run: |
           set -euo pipefail
           swift test -v --sanitize=address \
-            -Xcc -fno-omit-frame-pointer -Xcc -fsanitize=address \
-            -Xlinker -fsanitize=address
+            -Xcc -fno-omit-frame-pointer -Xcc -fsanitize=address
