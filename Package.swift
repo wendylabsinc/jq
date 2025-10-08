@@ -117,11 +117,6 @@ let package = Package(
                 .headerSearchPath("jq/src"),
                 .headerSearchPath("jq/modules/oniguruma/src"),
                 .headerSearchPath("include"),
-                .headerSearchPath("include/sys", .when(platforms: [.windows])),
-                // Inject Windows compatibility shims and MSVC niceties
-                .unsafeFlags(["-include", "Sources/Cjq/include/win_compat.h"], .when(platforms: [.windows])),
-                .define("_CRT_SECURE_NO_WARNINGS", .when(platforms: [.windows])),
-                .define("WIN32", .when(platforms: [.windows])),
                 // Silence noisy K&R-style prototypes in vendored Oniguruma during Debug builds
                 .unsafeFlags(["-Wno-deprecated-non-prototype"], .when(configuration: .debug)),
                 .unsafeFlags(["-Wno-everything"], .when(configuration: .release)),
