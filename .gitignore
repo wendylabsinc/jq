@@ -10,3 +10,4 @@ DerivedData/
 *.xcodeproj
 .home/
 *.log
+/docs

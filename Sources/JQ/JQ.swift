@@ -8,21 +8,35 @@ import Cjq
 /// Errors thrown by the JQ wrapper.
 ///
 /// These map to common failure points when compiling filters, parsing input, or executing jq.
+/// The associated `String` value contains a human‑readable message (usually produced by jq itself).
 ///
 /// Example:
 /// ```swift
 /// do {
-///     _ = try JQ.process(filter: "[", input: "{}")
+///     _ = try JQ.process(filter: "[", input: "{}") // invalid filter
 /// } catch let error as JQError {
+///     // Prints jq's detailed error
 ///     print(error.description)
 /// }
 /// ```
 public enum JQError: Error, CustomStringConvertible {
+    /// Thrown when the jq filter fails to compile.
+    /// The associated message is jq's compile error output.
     case compileError(String)
+
+    /// Thrown when jq reports an error while executing a compiled filter.
+    /// The associated message is jq's runtime error output.
     case executionError(String)
+
+    /// Thrown when the input cannot be parsed as valid JSON.
+    /// The associated message describes the parsing failure.
     case invalidJSON(String)
+
+    /// Thrown when an unexpected internal error occurs in the Swift wrapper
+    /// (e.g., failed to initialize jq state).
     case unexpectedError(String)
 
+    /// A human‑readable representation suitable for logs and debugging.
     public var description: String {
         switch self {
         case .compileError(let msg): return "JQ Compile Error: \(msg)"
@@ -88,6 +102,10 @@ public final class JQ: Sendable {
     ///   - input: JSON text to process.
     /// - Returns: An array of JSON strings (each element is a single jq output value, encoded as JSON).
     /// - Throws: `JQError` if the filter fails to compile, the input is invalid, or execution fails.
+    ///
+    /// - Note: Each output is a JSON fragment string. For strongly‑typed results, prefer
+    ///   ``JQ/process(filter:input:outputType:)`` which decodes to a `Decodable` type.
+    /// - Thread Safety: This method creates an isolated jq state per call and is safe to call from concurrent tasks.
     ///
     /// Example:
     /// ```swift
@@ -252,6 +270,7 @@ extension JQ {
     ///   - input: Any `Encodable` value that will be encoded to JSON for jq.
     ///   - outputType: The `Decodable` result type for each jq output value.
     /// - Returns: Array of decoded results of type `U`.
+    /// - Throws: `JQError` plus any decoding errors encountered when constructing `U`.
     ///
     /// Example:
     /// ```swift
