@@ -20,7 +20,7 @@ let package = Package(
         .macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .visionOS(.v1)
     ],
     dependencies: [
-        .package(url: "https://github.com/wendylabsinc/jq", from: "0.3.1")
+        .package(url: "https://github.com/wendylabsinc/jq", from: "0.4.0")
     ],
     targets: [
         .executableTarget(

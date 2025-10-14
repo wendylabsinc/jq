@@ -30,7 +30,7 @@ Add JQ to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wendylabsinc/jq", from: "0.3.0")
+    .package(url: "https://github.com/wendylabsinc/jq", from: "0.4.0")
 ]
 ```
 
