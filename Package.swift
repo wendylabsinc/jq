@@ -16,10 +16,16 @@ let package = Package(
             targets: ["JQ"]
         ),
     ],
-    dependencies: [
+    dependencies: {
+        #if canImport(Darwin)
         // DocC plugin for generating documentation from DocC comments
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
-    ],
+        return [
+            .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
+        ]
+        #else
+        return []
+        #endif
+    }(),
     targets: [
         .target(
             name: "Cjq",
@@ -41,16 +47,12 @@ let package = Package(
                 "jq/src/jv_alloc.c",
                 "jq/src/jv_aux.c",
                 "jq/src/jv_dtoa.c",
-                "jq/src/jv_dtoa_tsd.c",
-                "jq/src/jv_file.c",
                 "jq/src/jv_parse.c",
-                "jq/src/jv_print.c",
                 "jq/src/jv_unicode.c",
                 "jq/src/lexer.c",
                 "jq/src/linker.c",
                 "jq/src/locfile.c",
                 "jq/src/parser.c",
-                "jq/src/util.c",
                 // Oniguruma sources (use vendor path for portability)
                 "jq/modules/oniguruma/src/regparse.c",
                 "jq/modules/oniguruma/src/regext.c",
@@ -100,6 +102,11 @@ let package = Package(
                 "jq/modules/oniguruma/src/gb18030.c",
                 "jq/modules/oniguruma/src/koi8_r.c",
                 "jq/modules/oniguruma/src/cp1251.c",
+                "WinSupport/pthread_shim.c",
+                "Wrapped/jv_dtoa_tsd.c",
+                "Wrapped/jv_file.c",
+                "Wrapped/jv_print.c",
+                "Wrapped/util.c",
             ],
             publicHeadersPath: "include",
             cSettings: [
@@ -107,19 +114,24 @@ let package = Package(
                 .define("_GNU_SOURCE", .when(platforms: [.linux])),
                 .define("HAVE_MEMMEM", .when(platforms: [.linux, .macOS])),
                 .define("HAVE_ISATTY", .when(platforms: [.linux, .macOS])),
-                .define("HAVE_STRPTIME"),
+                .define("HAVE_STRPTIME", .when(platforms: [.linux, .macOS])),
                 .define("HAVE_STRFTIME"),
                 .define("HAVE_TIMEGM", .when(platforms: [.linux, .macOS])),
                 .define("HAVE_GMTIME_R", .when(platforms: [.linux, .macOS])),
                 .define("HAVE_LOCALTIME_R", .when(platforms: [.linux, .macOS])),
                 .define("IEEE_8087"),  // Little-endian IEEE floating point (x86, ARM)
+                .define("_CRT_SECURE_NO_WARNINGS", .when(platforms: [.windows])),
+                .define("_CRT_NONSTDC_NO_WARNINGS", .when(platforms: [.windows])),
+                .define("WIN32_LEAN_AND_MEAN", .when(platforms: [.windows])),
+                .define("WIN32", .when(platforms: [.windows])),
+                .define("_WIN32_WINNT", to: "0x0A00", .when(platforms: [.windows])),
                 // Enable Oniguruma-backed regex support in jq
                 .define("HAVE_LIBONIG", to: "1"),
                 // Prefer jq paths before our wrapper include dir
+                .headerSearchPath("include"),
                 .headerSearchPath("jq"),
                 .headerSearchPath("jq/src"),
                 .headerSearchPath("jq/modules/oniguruma/src"),
-                .headerSearchPath("include"),
                 // Avoid using unsafe compiler flags so this package can be
                 // consumed as a dependency without requiring Xcode/SPM opt‑ins.
             ],
