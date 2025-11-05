@@ -25,11 +25,11 @@ A Swift wrapper for [jq](https://jqlang.github.io/jq/) - a lightweight and flexi
 
 Add JQ to your Package.swift:
 
-`swift
+```swift
 dependencies: [
     .package(url: "https://github.com/wendylabsinc/jq", from: "0.5.0")
 ]
-`
+```
 
 Or add it via Xcode: File ▸ Add Package Dependencies…
 
@@ -41,7 +41,7 @@ The package now compiles natively on Windows with Swift 6.2 toolchains. No extra
 
 ### Basic Examples
 
-`swift
+```swift
 import JQ
 
 // Simple property access
@@ -73,11 +73,11 @@ let nycUsers = try JQ.process(
     input: usersJson
 )
 // nycUsers: ["\"Alice\"", "\"Charlie\""]
-`
+```
 
 ### Working with Data
 
-`swift
+```swift
 import Foundation
 import JQ
 
@@ -87,11 +87,11 @@ let jsonData = """
 
 let results = try JQ.process(filter: ".name", jsonData: jsonData)
 let name = String(data: results[0], encoding: .utf8)
-`
+```
 
 ### Working with Codable Types
 
-`swift
+```swift
 struct Person: Codable {
     let name: String
     let age: Int
@@ -106,11 +106,11 @@ let names: [String] = try JQ.process(
     outputType: String.self
 )
 print(names[0])  // "Alice"
-`
+```
 
 ### Error Handling
 
-`swift
+```swift
 do {
     _ = try JQ.process(filter: ".invalid[[[", input: json)
 } catch JQError.compileError(let msg) {
@@ -122,7 +122,7 @@ do {
 } catch {
     print("Unexpected error: \(error)")
 }
-`
+```
 
 ## Working Locally (Contributors)
 
@@ -130,46 +130,46 @@ Swift Package Manager automatically fetches this package's git submodules when y
 
 If you're developing in this repository locally, clone with submodules or initialize them after cloning:
 
-`ash
+```bash
 # Recommended: clone with submodules
 git clone --recursive https://github.com/wendylabsinc/jq
 cd jq
 
 # If you already cloned without --recursive
 git submodule update --init --recursive
-`
+```
 
 ## API Reference
 
 ### JQ.process(filter:input:)
 
-`swift
+```swift
 static func process(filter: String, input: String) throws -> [String]
-`
+```
 
 ### JQ.process(filter:jsonData:)
 
-`swift
+```swift
 static func process(filter: String, jsonData: Data) throws -> [Data]
-`
+```
 
 ### JQ.process(filter:input:outputType:)
 
-`swift
+```swift
 static func process<T: Encodable, U: Decodable>(
     filter: String,
     input: T,
     outputType: U.Type
 ) throws -> [U]
-`
+```
 
 ## Building
 
-`ash
+```bash
 swift build
 swift test
 swift build -c release
-`
+```
 
 ## How It Works
 
@@ -182,7 +182,7 @@ JQ embeds the complete jq library (v1.7.1) including oniguruma as vendored C sou
 
 ## Architecture
 
-`
+```
 JQ/
 ├── Sources/
 │   ├── Cjq/              # C bridge target
@@ -192,7 +192,7 @@ JQ/
 │   └── JQ/               # Swift wrapper API
 └── Tests/
     └── JQTests/
-`
+```
 
 ## Contributing
 
