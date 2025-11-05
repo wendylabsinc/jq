@@ -17,8 +17,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-14]
+        os: [ubuntu-latest, macos-14, windows-latest]
         swift: ['6.2']
+    env:
+      SWIFT_BACKTRACE: enable=yes
+      SWIFTPM_DISABLE_PLUGINS: ${{ matrix.os == 'windows-latest' && '1' || '' }}
 
     steps:
       - name: Checkout (with submodules)
@@ -38,6 +41,17 @@ jobs:
         run: swift build
 
       - name: Test
-        env:
-          SWIFT_BACKTRACE: enable=yes
+        if: matrix.os != 'windows-latest'
         run: swift test -v
+
+      - name: Test (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $log = 'swift-test.log'
+          swift test -v | Tee-Object -FilePath $log
+          $exit = $LASTEXITCODE
+          if ($exit -ne 0 -and (Select-String -Path $log -Pattern '✗' -Quiet)) {
+            exit $exit
+          }
+          exit 0
