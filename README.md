@@ -1,7 +1,7 @@
-# JQ
+﻿# JQ
 
 [![Swift](https://img.shields.io/badge/Swift-6.2+-orange.svg)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/Platforms-iOS%20|%20macOS%20|%20tvOS%20|%20watchOS%20|%20visionOS%20|%20Linux-blue.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS%20%7C%20Linux%20%7C%20Windows-blue.svg)](https://swift.org)
 [![CI](https://github.com/wendylabsinc/jq/actions/workflows/ci.yml/badge.svg)](https://github.com/wendylabsinc/jq/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -9,38 +9,39 @@ A Swift wrapper for [jq](https://jqlang.github.io/jq/) - a lightweight and flexi
 
 ## Features
 
-- ✅ Full jq 1.7.1 functionality embedded as a Swift package
-- ✅ Cross-platform support (macOS, iOS, tvOS, watchOS, visionOS, Linux)
-- ✅ Swift 6 compatible API
-- ✅ Type-safe Swift API with Codable support
-- ✅ Zero external dependencies (jq and oniguruma embedded via git submodules)
+- Full jq 1.7.1 functionality embedded as a Swift package
+- Cross-platform support (Apple platforms, Linux, and now Windows)
+- Swift 6 compatible API with Codable helpers
+- Zero external runtime dependencies (jq + oniguruma vendored via submodules)
 
 ## Requirements
 
 - Swift 6.2 or later
-- macOS 10.15+ / iOS 13+ / tvOS 13+ / watchOS 6+ / visionOS 1+ / Linux
-
-> Note: Windows support is coming soon. The current release targets Apple platforms and Linux.
+- macOS 10.15+ / iOS 13+ / tvOS 13+ / watchOS 6+ / visionOS 1+ / Linux / Windows 10+
 
 ## Installation
 
 ### Swift Package Manager
 
-Add JQ to your `Package.swift`:
+Add JQ to your Package.swift:
 
-```swift
+`swift
 dependencies: [
-    .package(url: "https://github.com/wendylabsinc/jq", from: "0.4.0")
+    .package(url: "https://github.com/wendylabsinc/jq", from: "0.5.0")
 ]
-```
+`
 
-Or add it via Xcode: File → Add Package Dependencies
+Or add it via Xcode: File ▸ Add Package Dependencies…
+
+### Windows notes
+
+The package now compiles natively on Windows with Swift 6.2 toolchains. No extra steps are required—just ensure the git submodule checkout is recursive (see Working Locally below).
 
 ## Usage
 
 ### Basic Examples
 
-```swift
+`swift
 import JQ
 
 // Simple property access
@@ -72,11 +73,11 @@ let nycUsers = try JQ.process(
     input: usersJson
 )
 // nycUsers: ["\"Alice\"", "\"Charlie\""]
-```
+`
 
 ### Working with Data
 
-```swift
+`swift
 import Foundation
 import JQ
 
@@ -86,11 +87,11 @@ let jsonData = """
 
 let results = try JQ.process(filter: ".name", jsonData: jsonData)
 let name = String(data: results[0], encoding: .utf8)
-```
+`
 
 ### Working with Codable Types
 
-```swift
+`swift
 struct Person: Codable {
     let name: String
     let age: Int
@@ -105,13 +106,13 @@ let names: [String] = try JQ.process(
     outputType: String.self
 )
 print(names[0])  // "Alice"
-```
+`
 
 ### Error Handling
 
-```swift
+`swift
 do {
-    let results = try JQ.process(filter: ".invalid[[[", input: json)
+    _ = try JQ.process(filter: ".invalid[[[", input: json)
 } catch JQError.compileError(let msg) {
     print("Filter compilation failed: \(msg)")
 } catch JQError.invalidJSON(let msg) {
@@ -121,109 +122,90 @@ do {
 } catch {
     print("Unexpected error: \(error)")
 }
-```
+`
 
 ## Working Locally (Contributors)
 
-Swift Package Manager automatically fetches this package's git submodules when you add it as a dependency — end users do not need to do anything special.
+Swift Package Manager automatically fetches this package's git submodules when you add it as a dependency—end users do not need to do anything special.
 
 If you're developing in this repository locally, clone with submodules or initialize them after cloning:
 
-```bash
+`ash
 # Recommended: clone with submodules
 git clone --recursive https://github.com/wendylabsinc/jq
 cd jq
 
 # If you already cloned without --recursive
 git submodule update --init --recursive
-```
+`
 
 ## API Reference
 
 ### JQ.process(filter:input:)
 
-```swift
+`swift
 static func process(filter: String, input: String) throws -> [String]
-```
-
-Process JSON string with a jq filter.
-
-- **Parameters:**
-  - `filter`: jq filter expression (e.g., ".foo", ".[] | select(.age > 21)")
-  - `input`: JSON string to process
-- **Returns:** Array of JSON strings (one for each output)
-- **Throws:** `JQError` if compilation or execution fails
+`
 
 ### JQ.process(filter:jsonData:)
 
-```swift
+`swift
 static func process(filter: String, jsonData: Data) throws -> [Data]
-```
-
-Process JSON data with a jq filter.
+`
 
 ### JQ.process(filter:input:outputType:)
 
-```swift
+`swift
 static func process<T: Encodable, U: Decodable>(
     filter: String,
     input: T,
     outputType: U.Type
 ) throws -> [U]
-```
-
-Process Codable input with a jq filter and decode to Codable output.
+`
 
 ## Building
 
-```bash
-# Build the package
+`ash
 swift build
-
-# Run tests
 swift test
-
-# Build in release mode
 swift build -c release
-```
+`
 
 ## How It Works
 
-JQSwift embeds the complete jq library (v1.7.1) including its regex engine (oniguruma) as C sources compiled directly into your Swift package. This approach provides:
+JQ embeds the complete jq library (v1.7.1) including oniguruma as vendored C sources. This provides:
 
-1. **Full compatibility**: All jq features work exactly as in the command-line tool
-2. **No external dependencies**: Everything is bundled in the package
-3. **Cross-platform**: Works on all Swift-supported platforms
-4. **Performance**: In-process library calls with no subprocess overhead
-
-The package uses git submodules to track upstream jq releases, making updates straightforward.
+1. Full compatibility: Same behaviour as jq CLI.
+2. No external dependencies: Everything ships in this package.
+3. Cross-platform: Works on Apple platforms, Linux, and Windows.
+4. Performance: In-process library calls (no subprocesses).
 
 ## Architecture
 
-```
+`
 JQ/
 ├── Sources/
-│   ├── Cjq/              # C library wrapper
+│   ├── Cjq/              # C bridge target
 │   │   ├── include/      # Public C headers and module map
-│   │   └── jq/           # Git submodule: jq source + oniguruma
+│   │   ├── jq/           # git submodule: jq source + oniguruma
+│   │   └── win/          # Windows compatibility shims
 │   └── JQ/               # Swift wrapper API
-├── Tests/
-│   └── JQTests/
-└── Package.swift
-```
+└── Tests/
+    └── JQTests/
+`
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please open issues or pull requests.
 
 ## License
 
-This package wraps jq, which is licensed under the MIT License. See the [jq repository](https://github.com/jqlang/jq) for details.
+This package wraps jq, which is licensed under the MIT License. See the [jq repository](https://github.com/jqlang/jq) for details. This wrapper is also MIT licensed.
 
 ## Acknowledgments
 
-- [jq](https://jqlang.github.io/jq/) - The amazing JSON processor by Stephen Dolan and contributors
-- [oniguruma](https://github.com/kkos/oniguruma) - Regular expression library
+- [jq](https://jqlang.github.io/jq/) by Stephen Dolan and contributors
+- [oniguruma](https://github.com/kkos/oniguruma)
 
 ## Resources
 
